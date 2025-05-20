@@ -106,7 +106,7 @@ export default function Home() {
               1.0.0
             </div>
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tighter">
-              Perfectly balanced.
+              Perfectly balanced
               <br />
               <span className="text-muted-foreground">
                 As all things should be.
