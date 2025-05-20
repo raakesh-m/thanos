@@ -1,19 +1,54 @@
 version: "3.8"
 
 services:
-  postgres:
-    image: postgres:16
-    container_name: postgres_db
+  # Local PostgreSQL database (commented out by default - uncomment to use)
+  # postgres:
+  #   image: postgres:16
+  #   container_name: postgres_db
+  #   restart: always
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: thanos
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - thanos-network
+
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thanos_app
     restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: thanos
     ports:
-      - "5432:5432"
+      - "3000:3000"
+    environment:
+      # Use Neon cloud database by default
+      - DATABASE_URL=${DATABASE_URL}
+      - BETTER_AUTH_URL=http://localhost:3000
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - DISCORD_CLIENT_SECRET=${DISCORD_CLIENT_SECRET}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - .:/app
+      - /app/node_modules
+    # Uncomment the line below when using local postgres
+    # depends_on:
+    #   - postgres
+    networks:
+      - thanos-network
 
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  thanos-network:
+    driver: bridge
